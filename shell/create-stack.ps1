@@ -1,7 +1,7 @@
 
 
 
-$STACK_NAME='Bluecheck-Lex' # Stack name must be lower case for S3 bucket naming convention
+$STACK_NAME='bluecheck-lex' # Stack name must be lower case for S3 bucket naming convention
 $KENDRA_WEBCRAWLER_URL= 'https://www.bluecheck.me' #'https://knocki.com/pages/faq' # Public or internal HTTPS website for Kendra to index via Web Crawler (e.g., https://www.investopedia.com/) - Please see https://docs.aws.amazon.com/kendra/latest/dg/data-source-web-crawler.html
 
 $AWS_REGION='us-east-1' # Stack deployment region
