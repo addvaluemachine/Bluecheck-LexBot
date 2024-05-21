@@ -185,8 +185,9 @@ aws cloudformation create-stack `
     "ParameterKey=WebAppConfToolbarTitle,ParameterValue='FAQ'" `
     "ParameterKey=WebAppConfBotInitialText,ParameterValue='How can I help?'" `
     "ParameterKey=ToolbarColor,ParameterValue='#2962ff'" `
-    "ParameterKey=ChatBackgroundColor,ParameterValue='#E3F2FD'" `
-    "ParameterKey=BotChatBubble,ParameterValue='#BBDEFB'" `
+    "ParameterKey=ChatBackgroundColor,ParameterValue='#FFFFFF'" `
+    "ParameterKey=BotChatBubble,ParameterValue='#ECEFF1'" `
+    "ParameterKey=CustomerChatBubble,ParameterValue='#BBDEFB'" `
     --capabilities CAPABILITY_NAMED_IAM CAPABILITY_AUTO_EXPAND `
     --region $AWS_REGION `
     --profile $AWS_PROFILE
