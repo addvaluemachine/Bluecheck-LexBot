@@ -538,12 +538,14 @@ Parameters:
 
     TitleLogoImgUrl:
         Type: String
+        Default: ''
         Description: >
          This is an optional parameter, when set to an image URL that is accessible by the application it will 
          display the image left of the toolbar title. Image must be formatted to the correct size for display.
 
     BotAvatarImgUrl:
         Type: String
+        Default: ''
         Description: >
          This is an optional parameter, when set to an image URL that is accessible by the application it will 
          display on the left of all bot messages

@@ -1,16 +1,17 @@
 
-$STACK_NAME='bluecheck-stack' # Stack name must be lower case for S3 bucket naming convention
+
+
+$STACK_NAME='Bluecheck-Lex' # Stack name must be lower case for S3 bucket naming convention
 $KENDRA_WEBCRAWLER_URL= 'https://www.bluecheck.me' #'https://knocki.com/pages/faq' # Public or internal HTTPS website for Kendra to index via Web Crawler (e.g., https://www.investopedia.com/) - Please see https://docs.aws.amazon.com/kendra/latest/dg/data-source-web-crawler.html
+
 $AWS_REGION='us-east-1' # Stack deployment region
-$PROFILE = '309847704252_AWSAdministratorAccess' 
+$AWS_PROFILE = '309847704252_AWSAdministratorAccess' 
 
 # Generate unique identifier
 $UNIQUE_IDENTIFIER = [guid]::NewGuid().ToString().ToLower().Replace("-", "").Substring(0,5)
 
 # Create S3 artifact bucket name
-#$S3_ARTIFACT_BUCKET_NAME = "$STACK_NAME-$UNIQUE_IDENTIFIER"
-
-$S3_ARTIFACT_BUCKET_NAME = 'bluecheck-stack-fe7dd'
+$S3_ARTIFACT_BUCKET_NAME = "$STACK_NAME-$UNIQUE_IDENTIFIER"
 
 # Define S3 keys
 $LAMBDA_HANDLER_S3_KEY = "agent/lambda/agent-handler/agent_deployment_package.zip"
@@ -19,12 +20,12 @@ $LEX_BOT_S3_KEY = "agent/bot/lex.zip"
 Write-Host "STACK_NAME: $STACK_NAME"
 Write-Host "S3_ARTIFACT_BUCKET_NAME: $S3_ARTIFACT_BUCKET_NAME"
 
-<# # Create S3 bucket
+# Create S3 bucket
 Write-Host "Creating Bucket: ${S3_ARTIFACT_BUCKET_NAME}"
-aws s3 mb "s3://$S3_ARTIFACT_BUCKET_NAME" --region $AWS_REGION --profile $PROFILE
+aws s3 mb "s3://$S3_ARTIFACT_BUCKET_NAME" --region $AWS_REGION --profile $AWS_PROFILE
 
 #Upload the contents of the  "../agent/" directory to the "agent" directory within the S3 bucket.
-aws s3 cp "C:\Project\Python\generative-ai-amazon-bedrock-langchain-agent-example\agent\" "s3://$S3_ARTIFACT_BUCKET_NAME/agent/" --region $AWS_REGION --recursive --exclude ".DS_Store" --exclude "*/.DS_Store" --profile $PROFILE
+aws s3 cp "C:\Project\Python\generative-ai-amazon-bedrock-langchain-agent-example\agent\" "s3://$S3_ARTIFACT_BUCKET_NAME/agent/" --region $AWS_REGION --recursive --exclude ".DS_Store" --exclude "*/.DS_Store" --profile $AWS_PROFILE
 
 # Publish Lambda layers
 Write-Host "Publish Lambda layers"
@@ -36,7 +37,7 @@ $BEDROCK_LANGCHAIN_PDFRW_LAYER_ARN = aws lambda publish-layer-version `
     --compatible-runtimes python3.11 `
     --region $AWS_REGION `
     --query LayerVersionArn --output text `
-    --profile $PROFILE
+    --profile $AWS_PROFILE
 
 Write-Host $BEDROCK_LANGCHAIN_PDFRW_LAYER_ARN
 
@@ -48,15 +49,16 @@ $CFNRESPONSE_LAYER_ARN = aws lambda publish-layer-version `
     --compatible-runtimes python3.11 `
     --region $AWS_REGION `
     --query LayerVersionArn --output text `
-    --profile $PROFILE
+    --profile $AWS_PROFILE
 
 Write-Host $CFNRESPONSE_LAYER_ARN 
 
 # Create CloudFormation stack
+$TEMPLATE_PATH= (Resolve-Path -Path ".\cfn\GenAI-FSI-Agent.yml").Path
 Write-Host "Create CloudFormation stack"
 aws cloudformation create-stack `
     --stack-name $STACK_NAME `
-    --template-body file://C:\Project\Python\generative-ai-amazon-bedrock-langchain-agent-example\cfn\GenAI-FSI-Agent.yml `
+    --template-body file://$TEMPLATE_PATH `
     --parameters `
     "ParameterKey=S3ArtifactBucket,ParameterValue=$($S3_ARTIFACT_BUCKET_NAME)" `
     "ParameterKey=LambdaHandlerS3Key,ParameterValue=$($LAMBDA_HANDLER_S3_KEY)" `
@@ -66,13 +68,13 @@ aws cloudformation create-stack `
     "ParameterKey=KendraWebCrawlerUrl,ParameterValue=$($KENDRA_WEBCRAWLER_URL)" `
     --capabilities CAPABILITY_NAMED_IAM `
     --region $AWS_REGION `
-    --profile $PROFILE
+    --profile $AWS_PROFILE
 
 # Check stack creation status
 Write-Host "Check stack creation status"
-aws cloudformation describe-stacks --stack-name $STACK_NAME --region $AWS_REGION --query "Stacks[0].StackStatus" --profile $PROFILE
-aws cloudformation wait stack-create-complete --stack-name $STACK_NAME --region $AWS_REGION --profile $PROFILE
-aws cloudformation describe-stacks --stack-name $STACK_NAME --region $AWS_REGION --query "Stacks[0].StackStatus" --profile $PROFILE
+aws cloudformation describe-stacks --stack-name $STACK_NAME --region $AWS_REGION --query "Stacks[0].StackStatus" --profile $AWS_PROFILE
+aws cloudformation wait stack-create-complete --stack-name $STACK_NAME --region $AWS_REGION --profile $AWS_PROFILE
+aws cloudformation describe-stacks --stack-name $STACK_NAME --region $AWS_REGION --query "Stacks[0].StackStatus" --profile $AWS_PROFILE
 
 # Fetch Lex bot ID
 Write-Host "Fetch Lex bot ID"
@@ -80,7 +82,7 @@ $LEX_BOT_ID = aws cloudformation describe-stacks `
     --stack-name $STACK_NAME `
     --region $AWS_REGION `
     --query 'Stacks[0].Outputs[?OutputKey==`LexBotID`].OutputValue' --output text `
-    --profile $PROFILE
+    --profile $AWS_PROFILE
 
 Write-Host "LEX_BOT_ID: $LEX_BOT_ID"
 
@@ -90,7 +92,7 @@ $LAMBDA_ARN = aws cloudformation describe-stacks `
     --stack-name $STACK_NAME `
     --region $AWS_REGION `
     --query 'Stacks[0].Outputs[?OutputKey==`LambdaARN`].OutputValue' --output text `
-    --profile $PROFILE
+    --profile $AWS_PROFILE
 
 Write-Host "LAMBDA_ARN: $LAMBDA_ARN"
 
@@ -118,11 +120,11 @@ aws lexv2-models update-bot-alias `
     --bot-version 'DRAFT' `
     --bot-alias-locale-settings "$localeSettings" `
     --region $AWS_REGION `
-    --profile $PROFILE
+    --profile $AWS_PROFILE
 
 # Build Lex bot locale
 Write-Host "Build Lex bot locale"
-aws lexv2-models build-bot-locale --bot-id $LEX_BOT_ID --bot-version "DRAFT" --locale-id "en_US" --region $AWS_REGION --profile $PROFILE
+aws lexv2-models build-bot-locale --bot-id $LEX_BOT_ID --bot-version "DRAFT" --locale-id "en_US" --region $AWS_REGION --profile $AWS_PROFILE
 
 # Fetch Kendra resources
 Write-Host "Fetch Kendra resources"
@@ -130,7 +132,7 @@ $KENDRA_INDEX_ID = aws cloudformation describe-stacks `
     --stack-name $STACK_NAME `
     --region $AWS_REGION `
     --query 'Stacks[0].Outputs[?OutputKey==`KendraIndexID`].OutputValue' --output text `
-    --profile $PROFILE
+    --profile $AWS_PROFILE
 
 Write-Host "KENDRA_INDEX_ID $KENDRA_INDEX_ID"
 
@@ -138,7 +140,7 @@ $KENDRA_DATA_SOURCE_ROLE_ARN = aws cloudformation describe-stacks `
     --stack-name $STACK_NAME `
     --region $AWS_REGION `
     --query 'Stacks[0].Outputs[?OutputKey==`KendraDataSourceRoleARN`].OutputValue' --output text `
-    --profile $PROFILE
+    --profile $AWS_PROFILE
 
 Write-Host "KENDRA_DATA_SOURCE_ROLE_ARN $KENDRA_DATA_SOURCE_ROLE_ARN"
 
@@ -146,13 +148,13 @@ $KENDRA_WEBCRAWLER_DATA_SOURCE_ID = aws cloudformation describe-stacks `
     --stack-name $STACK_NAME `
     --region $AWS_REGION `
     --query 'Stacks[0].Outputs[?OutputKey==`KendraWebCrawlerDataSourceID`].OutputValue' --output text `
-    --profile $PROFILE
+    --profile $AWS_PROFILE
 
 Write-Host "KENDRA_WEBCRAWLER_DATA_SOURCE_ID $KENDRA_WEBCRAWLER_DATA_SOURCE_ID"
-#>
+
 # Start Kendra data source sync job
-#Write-Host "Start Kendra data source sync job"
-#aws kendra start-data-source-sync-job --id $KENDRA_WEBCRAWLER_DATA_SOURCE_ID --index-id $KENDRA_INDEX_ID --region $AWS_REGION --profile $PROFILE
+Write-Host "Start Kendra data source sync job"
+aws kendra start-data-source-sync-job --id $KENDRA_WEBCRAWLER_DATA_SOURCE_ID --index-id $KENDRA_INDEX_ID --region $AWS_REGION --profile $AWS_PROFILE
 
 $LEX_BOT_ID='HIDXHUWLJW'
 
@@ -160,29 +162,36 @@ $LEX_BOT_ALIAS_ID = aws lexv2-models list-bot-aliases `
     --bot-id $LEX_BOT_ID `
     --region $AWS_REGION `
     --query "botAliasSummaries[?botAliasName=='TestBotAlias'].botAliasId" --output text `
-    --profile $PROFILE
+    --profile $AWS_PROFILE
 
 Write-Host "LEX_BOT_ALIAS_ID $LEX_BOT_ALIAS_ID"
 
-$UI_STACK_NAME = "$STACK_NAME-Web-UI"
+#Create CloudFormation stack for Lex UI
+
+$UI_STACK_NAME = "$STACK_NAME-UI"
+$UI_TEMPLATE_PATH= (Resolve-Path -Path ".\cfn\Lex-UI.yaml").Path
+
 Write-Host "Create CloudFormation stack for Lex UI"
 aws cloudformation create-stack `
     --stack-name $UI_STACK_NAME `
-    --template-body file://C:\Project\Python\generative-ai-amazon-bedrock-langchain-agent-example\cfn\Lex-UI.yaml `
+    --template-body file://$UI_TEMPLATE_PATH `
     --parameters `
     "ParameterKey=LexV2BotId,ParameterValue=$($LEX_BOT_ID)" `
     "ParameterKey=LexV2BotAliasId,ParameterValue=$($LEX_BOT_ALIAS_ID)" `
     "ParameterKey=LexV2BotLocaleId,ParameterValue='en_US'" `
     "ParameterKey=WebAppParentOrigin,ParameterValue=$($KENDRA_WEBCRAWLER_URL)" `
-    "ParameterKey=ShouldLoadIframeMinimized,ParameterValue=false" `
-    "ParameterKey=CodeBuildName,ParameterValue='lex-web-ui-bluecheck'" `
+    "ParameterKey=ShouldLoadIframeMinimized,ParameterValue=true" `
+    "ParameterKey=CodeBuildName,ParameterValue=$($UI_STACK_NAME)" `
     "ParameterKey=WebAppConfToolbarTitle,ParameterValue='FAQ'" `
+    "ParameterKey=WebAppConfBotInitialText,ParameterValue='How can I help?'" `
+    "ParameterKey=ToolbarColor,ParameterValue='#2962ff'" `
+    "ParameterKey=ChatBackgroundColor,ParameterValue='#E3F2FD'" `
+    "ParameterKey=BotChatBubble,ParameterValue='#BBDEFB'" `
     --capabilities CAPABILITY_NAMED_IAM CAPABILITY_AUTO_EXPAND `
     --region $AWS_REGION `
-    --profile $PROFILE
-
+    --profile $AWS_PROFILE
 
 Write-Host "Check UI stack creation status"
-aws cloudformation describe-stacks --stack-name $UI_STACK_NAME --region $AWS_REGION --query "Stacks[0].StackStatus" --profile $PROFILE
-aws cloudformation wait stack-create-complete --stack-name $UI_STACK_NAME --region $AWS_REGION --profile $PROFILE
-aws cloudformation describe-stacks --stack-name $UI_STACK_NAME --region $AWS_REGION --query "Stacks[0].StackStatus" --profile $PROFILE
+aws cloudformation describe-stacks --stack-name $UI_STACK_NAME --region $AWS_REGION --query "Stacks[0].StackStatus" --profile $AWS_PROFILE
+aws cloudformation wait stack-create-complete --stack-name $UI_STACK_NAME --region $AWS_REGION --profile $AWS_PROFILE
+aws cloudformation describe-stacks --stack-name $UI_STACK_NAME --region $AWS_REGION --query "Stacks[0].StackStatus" --profile $AWS_PROFILE
