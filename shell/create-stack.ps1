@@ -25,7 +25,8 @@ Write-Host "Creating Bucket: ${S3_ARTIFACT_BUCKET_NAME}"
 aws s3 mb "s3://$S3_ARTIFACT_BUCKET_NAME" --region $AWS_REGION --profile $AWS_PROFILE
 
 #Upload the contents of the  "../agent/" directory to the "agent" directory within the S3 bucket.
-aws s3 cp "C:\Project\Python\generative-ai-amazon-bedrock-langchain-agent-example\agent\" "s3://$S3_ARTIFACT_BUCKET_NAME/agent/" --region $AWS_REGION --recursive --exclude ".DS_Store" --exclude "*/.DS_Store" --profile $AWS_PROFILE
+$AGENT_PATH= (Resolve-Path -Path ".\agent\").Path
+aws s3 cp $AGENT_PATH "s3://$S3_ARTIFACT_BUCKET_NAME/agent/" --region $AWS_REGION --recursive --exclude ".DS_Store" --exclude "*/.DS_Store" --profile $AWS_PROFILE
 
 # Publish Lambda layers
 Write-Host "Publish Lambda layers"
