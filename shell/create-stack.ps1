@@ -157,7 +157,6 @@ Write-Host "KENDRA_WEBCRAWLER_DATA_SOURCE_ID $KENDRA_WEBCRAWLER_DATA_SOURCE_ID"
 Write-Host "Start Kendra data source sync job"
 aws kendra start-data-source-sync-job --id $KENDRA_WEBCRAWLER_DATA_SOURCE_ID --index-id $KENDRA_INDEX_ID --region $AWS_REGION --profile $AWS_PROFILE
 
-$LEX_BOT_ID='HIDXHUWLJW'
 
 $LEX_BOT_ALIAS_ID = aws lexv2-models list-bot-aliases `
     --bot-id $LEX_BOT_ID `
