@@ -2,7 +2,7 @@
 
 
 $STACK_NAME='bluecheck-lex' # Stack name must be lower case for S3 bucket naming convention
-$KENDRA_WEBCRAWLER_URL= 'https://www.bluecheck.me' #'https://knocki.com/pages/faq' # Public or internal HTTPS website for Kendra to index via Web Crawler (e.g., https://www.investopedia.com/) - Please see https://docs.aws.amazon.com/kendra/latest/dg/data-source-web-crawler.html
+$KENDRA_WEBCRAWLER_URL= 'https://www.bluecheck.me' # Public or internal HTTPS website for Kendra to index via Web Crawler (e.g., https://www.investopedia.com/) - Please see https://docs.aws.amazon.com/kendra/latest/dg/data-source-web-crawler.html
 
 $AWS_REGION='us-east-1' # Stack deployment region
 $AWS_PROFILE = '309847704252_AWSAdministratorAccess' 
@@ -196,7 +196,7 @@ Write-Output "Created alias $NEW_ALIAS pointing to version $NEW_BOT_VERSION"
 $LEX_BOT_ALIAS_ID = aws lexv2-models list-bot-aliases `
     --bot-id $LEX_BOT_ID `
     --region $AWS_REGION `
-    --query "botAliasSummaries[?botAliasName==$NEW_ALIAS].botAliasId" --output text `
+    --query "botAliasSummaries[?botAliasName=='$NEW_ALIAS'].botAliasId" --output text `
     --profile $AWS_PROFILE
 
 Write-Host "LEX_BOT_ALIAS_ID $LEX_BOT_ALIAS_ID"
