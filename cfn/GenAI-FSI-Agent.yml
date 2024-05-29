@@ -246,10 +246,9 @@ Resources:
             MaxLinksPerPage: 20
             MaxUrlsPerMinuteCrawlRate: 100
             Urls: 
-              SeedUrlConfiguration:
-                SeedUrls: 
+              SiteMapsConfiguration:
+                SiteMaps: 
                   - !Ref KendraWebCrawlerUrl
-                WebCrawlerMode: SUBDOMAINS
 
   LexBotRole:
     Type: AWS::IAM::Role
