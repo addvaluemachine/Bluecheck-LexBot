@@ -4,7 +4,10 @@
 $STACK_NAME='bluecheck-lex' 
 
 # Public or internal HTTPS website for Kendra to index via Web Crawler (e.g., https://www.investopedia.com/) - Please see https://docs.aws.amazon.com/kendra/latest/dg/data-source-web-crawler.html
-$KENDRA_WEBCRAWLER_URL= 'https://docs.bluecheck.me/sitemap.xml,https://www.bluecheck.me/sitemap.xml' 
+$KENDRA_WEBCRAWLER_URL= @(
+    "https://docs.bluecheck.me/sitemap.xml",
+    "https://www.bluecheck.me/sitemap.xml"
+)
 
 $AWS_REGION='us-east-1' # Stack deployment region
 $AWS_PROFILE = '309847704252_AWSAdministratorAccess' 
